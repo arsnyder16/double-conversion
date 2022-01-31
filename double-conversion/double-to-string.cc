@@ -80,7 +80,7 @@ void DoubleToStringConverter::CreateExponentialRepresentation(
   DOUBLE_CONVERSION_ASSERT(length != 0);
   result_builder->AddCharacter(decimal_digits[0]);
   if (length != 1) {
-    result_builder->AddCharacter('.');
+    result_builder->AddCharacter(decimal_separator_);
     result_builder->AddSubstring(&decimal_digits[1], length-1);
   }
   result_builder->AddCharacter(exponent_character_);
@@ -127,7 +127,7 @@ void DoubleToStringConverter::CreateDecimalRepresentation(
       // "0.00000decimal_rep" or "0.000decimal_rep00".
     result_builder->AddCharacter('0');
     if (digits_after_point > 0) {
-      result_builder->AddCharacter('.');
+      result_builder->AddCharacter(decimal_separator_);
       result_builder->AddPadding('0', -decimal_point);
       DOUBLE_CONVERSION_ASSERT(length <= digits_after_point - (-decimal_point));
       result_builder->AddSubstring(decimal_digits, length);
@@ -139,14 +139,14 @@ void DoubleToStringConverter::CreateDecimalRepresentation(
     result_builder->AddSubstring(decimal_digits, length);
     result_builder->AddPadding('0', decimal_point - length);
     if (digits_after_point > 0) {
-      result_builder->AddCharacter('.');
+      result_builder->AddCharacter(decimal_separator_);
       result_builder->AddPadding('0', digits_after_point);
     }
   } else {
     // "decima.l_rep000".
     DOUBLE_CONVERSION_ASSERT(digits_after_point > 0);
     result_builder->AddSubstring(decimal_digits, decimal_point);
-    result_builder->AddCharacter('.');
+    result_builder->AddCharacter(decimal_separator_);
     DOUBLE_CONVERSION_ASSERT(length - decimal_point <= digits_after_point);
     result_builder->AddSubstring(&decimal_digits[decimal_point],
                                  length - decimal_point);
@@ -155,7 +155,7 @@ void DoubleToStringConverter::CreateDecimalRepresentation(
   }
   if (digits_after_point == 0) {
     if ((flags_ & EMIT_TRAILING_DECIMAL_POINT) != 0) {
-      result_builder->AddCharacter('.');
+      result_builder->AddCharacter(decimal_separator_);
     }
     if ((flags_ & EMIT_TRAILING_ZERO_AFTER_POINT) != 0) {
       result_builder->AddCharacter('0');

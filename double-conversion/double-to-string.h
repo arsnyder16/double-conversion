@@ -145,7 +145,8 @@ class DoubleToStringConverter {
                           int decimal_in_shortest_high,
                           int max_leading_padding_zeroes_in_precision_mode,
                           int max_trailing_padding_zeroes_in_precision_mode,
-                          int min_exponent_width = 0)
+                          int min_exponent_width = 0,
+                          char decimal_separator = '.')
       : flags_(flags),
         infinity_symbol_(infinity_symbol),
         nan_symbol_(nan_symbol),
@@ -156,7 +157,8 @@ class DoubleToStringConverter {
             max_leading_padding_zeroes_in_precision_mode),
         max_trailing_padding_zeroes_in_precision_mode_(
             max_trailing_padding_zeroes_in_precision_mode),
-        min_exponent_width_(min_exponent_width) {
+        min_exponent_width_(min_exponent_width),
+        decimal_separator_(decimal_separator) {
     // When 'trailing zero after the point' is set, then 'trailing point'
     // must be set too.
     DOUBLE_CONVERSION_ASSERT(((flags & EMIT_TRAILING_DECIMAL_POINT) != 0) ||
@@ -436,6 +438,7 @@ class DoubleToStringConverter {
   const int max_leading_padding_zeroes_in_precision_mode_;
   const int max_trailing_padding_zeroes_in_precision_mode_;
   const int min_exponent_width_;
+  char decimal_separator_;
 
   DOUBLE_CONVERSION_DISALLOW_IMPLICIT_CONSTRUCTORS(DoubleToStringConverter);
 };

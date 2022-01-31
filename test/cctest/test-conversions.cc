@@ -124,6 +124,7 @@ TEST(DoubleToShortest) {
   builder.Reset();
   CHECK(dcExpWidth2.ToShortest(1000000000.0, &builder));
   CHECK_EQ("1e+09", builder.Finalize());
+  
 
   DoubleToStringConverter dcExpWidth0(flags, NULL, NULL, 'e', -4, 6, 0, 0, 0);
 
@@ -278,6 +279,14 @@ TEST(DoubleToShortest) {
   builder.Reset();
   CHECK(dc6.ToShortest(-Double::NaN(), &builder));
   CHECK_EQ("NaN", builder.Finalize());
+
+  DoubleToStringConverter separator(DoubleToStringConverter::NO_FLAGS, NULL, NULL, 'e', -4, 6, 0, 0, 2, ',');
+  builder.Reset();
+  CHECK(separator.ToShortest(11111111111.0, &builder));
+  CHECK_EQ("1,1111111111e+10", builder.Finalize());
+  builder.Reset();
+  CHECK(separator.ToShortest(1000000000.0, &builder));
+  CHECK_EQ("1e+09", builder.Finalize());
 }
 
 
@@ -434,6 +443,14 @@ TEST(DoubleToShortestSingle) {
   builder.Reset();
   CHECK(dc6.ToShortestSingle(-Single::NaN(), &builder));
   CHECK_EQ("NaN", builder.Finalize());
+
+  DoubleToStringConverter separator(DoubleToStringConverter::NO_FLAGS, NULL, NULL, 'e', -4, 6, 0, 0, 2, ',');
+  builder.Reset();
+  CHECK(separator.ToShortestSingle(11111111111.0f, &builder));
+  CHECK_EQ("1,1111111111e+10", builder.Finalize());
+  builder.Reset();
+  CHECK(separator.ToShortestSingle(1000000000.0f, &builder));
+  CHECK_EQ("1e+09", builder.Finalize());
 }
 
 
@@ -781,6 +798,52 @@ TEST(DoubleToFixed) {
   builder.Reset();
   CHECK(dc9.ToFixed(-Double::NaN(), 1, &builder));
   CHECK_EQ("NaN", builder.Finalize());
+
+  flags = DoubleToStringConverter::NO_FLAGS;
+  DoubleToStringConverter dc10(flags, NULL, NULL, 'e', 0, 0, 0, 0, 0, ',');
+
+  builder.Reset();
+  CHECK(dc10.ToFixed(3.12, 1, &builder));
+  CHECK_EQ("3,1", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc10.ToFixed(3.1415, 3, &builder));
+  CHECK_EQ("3,142", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc10.ToFixed(1234.56789, 4, &builder));
+  CHECK_EQ("1234,5679", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc10.ToFixed(1.23, 5, &builder));
+  CHECK_EQ("1,23000", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc10.ToFixed(0.1, 4, &builder));
+  CHECK_EQ("0,1000", builder.Finalize());
+
+  flags = DoubleToStringConverter::EMIT_TRAILING_DECIMAL_POINT;
+  DoubleToStringConverter dc11(flags, NULL, NULL, 'e', 0, 0, 0, 0, 0, ',');
+
+  builder.Reset();
+  CHECK(dc11.ToFixed(123.45, 0, &builder));
+  CHECK_EQ("123,", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc11.ToFixed(0.678, 0, &builder));
+  CHECK_EQ("1,", builder.Finalize());
+
+  flags = DoubleToStringConverter::EMIT_TRAILING_DECIMAL_POINT |
+      DoubleToStringConverter::EMIT_TRAILING_ZERO_AFTER_POINT;
+  DoubleToStringConverter dc12(flags, NULL, NULL, 'e', 0, 0, 0, 0, 0, ',');
+
+  builder.Reset();
+  CHECK(dc12.ToFixed(123.45, 0, &builder));
+  CHECK_EQ("123,0", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc12.ToFixed(0.678, 0, &builder));
+  CHECK_EQ("1,0", builder.Finalize());
 }
 
 
@@ -965,6 +1028,17 @@ TEST(DoubleToExponential) {
   builder.Reset();
   CHECK(dc5.ToExponential(1.0, 6, &builder));
   CHECK_EQ("1.000000e00", builder.Finalize());
+
+  flags = DoubleToStringConverter::NO_FLAGS;
+  DoubleToStringConverter dc6(flags, "Infinity", "NaN", 'e', 0, 0, 0, 0, 0, ',');
+
+  builder.Reset();
+  CHECK(dc6.ToExponential(3.12, 1, &builder));
+  CHECK_EQ("3,1e0", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc6.ToExponential(5.0, 3, &builder));
+  CHECK_EQ("5,000e0", builder.Finalize());
 }
 
 
@@ -1259,6 +1333,24 @@ TEST(DoubleToPrecision) {
   builder.Reset();
   CHECK(dc5.ToPrecision(2000080, 5, &builder));
   CHECK_EQ("2.0001e6", builder.Finalize());
+
+  flags = DoubleToStringConverter::NO_FLAGS;
+  DoubleToStringConverter dc11(flags, NULL, NULL, 'e', 0, 0, 0, 1, 0, ',');
+  builder.Reset();
+  CHECK(dc11.ToPrecision(230.0, 2, &builder));
+  CHECK_EQ("230", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc11.ToPrecision(23.0, 2, &builder));
+  CHECK_EQ("23", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc11.ToPrecision(2.30, 2, &builder));
+  CHECK_EQ("2,3", builder.Finalize());
+
+  builder.Reset();
+  CHECK(dc11.ToPrecision(2300.0, 2, &builder));
+  CHECK_EQ("2,3e3", builder.Finalize());
 }
 
 
